@@ -34,6 +34,18 @@ export const CataloguePage = () => {
   const [genre, setGenre] = useState("");
 
   // TODO : écrire le useQuery ici
+  const { data: movies, isLoading, isError } = useQuery({
+    queryKey: ["movies", search, genre],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (genre) params.set("genre", genre);
+      const path = `/movies${`?${params.toString()}`}`;
+      return api.get<Movie[]>(path);
+    },
+  });
+
+
 
   return (
     <div>
@@ -41,6 +53,15 @@ export const CataloguePage = () => {
       <SearchBar onSearch={setSearch} onGenreChange={setGenre} />
 
       {/* TODO : afficher loading, error, et la liste de films */}
+      {isLoading && <p>Chargement...</p>}
+      {isError && <p>Erreur lors du chargement des films.</p>}
+      {movies && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {movies.map((movie) => (
+            <MovieCard key={movie.id} movie={movie} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

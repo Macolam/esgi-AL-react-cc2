@@ -26,7 +26,7 @@ type SearchBarProps = {
 
 export const SearchBar = ({ onSearch, onGenreChange }: SearchBarProps) => {
   const [search, setSearch] = useState("");
-  let genre = "";
+  const [genre, setGenre] = useState("");
 
   return (
     <div className="flex gap-4 mb-6">
@@ -44,8 +44,10 @@ export const SearchBar = ({ onSearch, onGenreChange }: SearchBarProps) => {
       <select
         value={genre}
         onChange={(e) => {
-          genre = e.target.value;
-          onGenreChange(genre);
+          const value = e.target.value;
+          setGenre(value);
+          console.log("Genre sélectionné :", value);
+          onGenreChange(value);
         }}
         className="px-4 py-2 border rounded-lg"
       >

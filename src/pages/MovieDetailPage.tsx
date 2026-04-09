@@ -37,5 +37,38 @@ import type { Movie } from "../types/movie";
 //
 
 export const MovieDetailPage = () => {
-  return <div>TODO : compléter cette page</div>;
+  const { id } = useParams();
+  const queryClient = useQueryClient();
+  const { data: movie, isLoading, isError } = useQuery({
+    queryKey: ["movie", id],
+    queryFn: () => api.get<Movie>(`/movies/${id}`),
+  });
+
+  if (isLoading) return <div>Chargement...</div>;
+  if (isError) return <div>Erreur lors du chargement du film.</div>;
+  if (!movie) return <div>Film non trouvé.</div>;
+  return <div className="max-w-2xl mx-auto">
+    <img
+      src={movie.imageUrl}
+      className="w-full h-64 object-cover rounded-lg"
+    />
+    <h1 className="text-3xl font-bold mt-4">{movie.title}</h1>
+    <h2 className="text-gray-600 mt-1">
+      {movie.director} - {movie.year} - {movie.genre}
+    </h2>
+    <p className="text-gray-700 mt-4">{movie.description}</p>
+    <button
+      className={`mt-4 px-4 py-2 rounded-lg text-white ${
+        movie.watched ? "bg-green-600" : "bg-gray-500"
+      }`}
+      onClick={() => {
+        api.post(`/movies/${id}/toggle-watched`).then(() => {
+          queryClient.invalidateQueries({ queryKey: ["movie", id] });
+        });
+      }}
+    >
+      {movie.watched ? "vu" : "Pas vu"}
+    </button>
+  </div>;
+
 };
